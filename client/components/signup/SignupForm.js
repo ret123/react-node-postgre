@@ -37,7 +37,13 @@ class SignupForm extends React.Component {
             this.setState({errors : {}, isLoading: true });
             this.props.userSignupRequest(this.state)
                 .then(
-                    () => { this.context.router.history.push('/')},
+                    () => { 
+                        this.props.addFlashMessage({
+                            type: 'success',
+                            text: 'You have signed up successfully. Welcome!'
+                        });
+                        this.context.router.history.push('/');
+                    },
                     (err) => this.setState({errors: err.response.data, isLoading: false})
                             
                 );
@@ -45,9 +51,17 @@ class SignupForm extends React.Component {
     }
     render() {
         const {errors, isLoading} = this.state;
-        const options = map(timezone,(val,key) =>
-            <option key={val} value={val}>{key}</option>
-        );
+        const options = [];
+       
+        for ( let key in timezone) {
+          options.push(<option key ={`${timezone[key]}`} value={`${timezone[key]}`}>{`${key}`} </option>);
+
+        }
+        //! Or use lodash map method to iterate for the timezone collection
+        // const options = map(timezone,(val,key) =>
+        //     <option key={val} value={val}>{key}</option>
+        // );
+           
         return (
             <form onSubmit={this.onSubmit}>
                 <h2>Join our community!</h2>
@@ -113,8 +127,9 @@ class SignupForm extends React.Component {
                           aria-describedby="emailHelp" 
                          
                     >
-                        <option value="" disabled>Choose your timezone</option>
-                        {options}
+                      <option value="" disabled>Choose your timezone</option>
+                       {options}
+                        
                     </select>
                     {errors.timezone && <span className="help-block invalid-feedback">{errors.timezone}</span>}
                 </div>
@@ -126,7 +141,8 @@ class SignupForm extends React.Component {
     }
 }
 SignupForm.propTypes = {
-    userSignupRequest: PropTypes.func.isRequired
+    userSignupRequest: PropTypes.func.isRequired,
+    addFlashMessage: PropTypes.func.isRequired
 }
 SignupForm.contextTypes = {
     router: PropTypes.object.isRequired
