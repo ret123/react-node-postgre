@@ -22,10 +22,20 @@ function validateInput(data,otherValidations) {
          errors,
          isValid: isEmpty(errors)
      }
- })
-}
+ });
+};
 
 const usersRoutes = (app) => {
+    app.get('/api/users/:identifier',(req,res) => {
+        User.query({
+            select: [ 'username', 'email' ],
+            where: { email: req.params.identifier },
+            orWhere: { username: req.params.identifier }
+          }).fetch().then(user => {
+              res.json({ user });
+            });
+    });
+
     app.post('/api/users',(req,res) => {
        validateInput(req.body,commonValidations)
         .then(({errors, isValid}) => {
@@ -42,6 +52,8 @@ const usersRoutes = (app) => {
            }
         });
     });
+
+   
        
 }
 export default usersRoutes;

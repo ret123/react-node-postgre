@@ -14,10 +14,32 @@ class SignupForm extends React.Component {
             passwordConfirmation: '',
             timezone: '',
             errors: {},
-            isLoading: false
+            isLoading: false,
+            invalid: false,
         }
         this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+        this.checkUserExist = this.checkUserExist.bind(this);
+    }
+
+    checkUserExist(e) {
+        const field = e.target.name;
+        const val = e.target.value;
+        if(val !== '') {
+            this.props.isUserExists(val)
+                .then(res => {
+                    let errors = this.state.errors;
+                    let invalid; 
+                    if(res.data.user) {
+                        errors[field] = 'There is user with such ' + field;
+                        invalid = true
+                    } else {
+                        errors[field] = '';
+                        invalid = false;
+                    }
+                    this.setState({errors, invalid});
+                });
+        }
     }
     onChange(e) {
         this.setState({
@@ -50,7 +72,7 @@ class SignupForm extends React.Component {
         }
     }
     render() {
-        const {errors, isLoading} = this.state;
+        const {errors, isLoading,invalid} = this.state;
         const options = [];
        
         for ( let key in timezone) {
@@ -70,6 +92,7 @@ class SignupForm extends React.Component {
                     <input 
                           value={this.state.username}
                           onChange={this.onChange}
+                          onBlur = {this.checkUserExist}
                           type="username"
                           className={ !errors.username ? "form-control" : " form-control is-invalid" }
                           name="username" 
@@ -83,6 +106,7 @@ class SignupForm extends React.Component {
                     <input 
                           value={this.state.email}
                           onChange={this.onChange}
+                          onBlur = {this.checkUserExist}
                           type="email"
                           className={ !errors.email ? "form-control" : " form-control is-invalid" }
                           name="email" 
@@ -135,14 +159,15 @@ class SignupForm extends React.Component {
                 </div>
                 
               
-                <button type="submit" className="btn btn-primary" disabled={isLoading}>Signup</button>
+                <button type="submit" className="btn btn-primary" disabled={isLoading || invalid}>Signup</button>
             </form>
         );
     }
 }
 SignupForm.propTypes = {
     userSignupRequest: PropTypes.func.isRequired,
-    addFlashMessage: PropTypes.func.isRequired
+    addFlashMessage: PropTypes.func.isRequired,
+    isUserExists: PropTypes.func.isRequired
 }
 SignupForm.contextTypes = {
     router: PropTypes.object.isRequired
