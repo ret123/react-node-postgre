@@ -54,3 +54,9 @@ export const logout = () => {
     }
 }
 
+export const createEvent = (event) => {
+    return dispatch => {
+        return axios.post('/api/events',event);
+    }
+}
+

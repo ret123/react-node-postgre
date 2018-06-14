@@ -7,11 +7,13 @@ import webpackHotMiddleware from 'webpack-hot-middleware';
 import webpackConfig from '../webpackConfig.dev';
 import usersRoutes from './routes/usersRoutes';
 import authRoutes from './routes/authRoutes';
+import eventsRoutes from './routes/eventsRoutes';
 
 let app = express();
 app.use(bodyParser.json());
 usersRoutes(app);
 authRoutes(app);
+eventsRoutes(app);
 const compiler = webpack(webpackConfig);
 app.use(webpackMiddleware(compiler, {
      hot: true,
